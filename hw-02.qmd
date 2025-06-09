@@ -18,7 +18,9 @@ if (!require("pacman"))
 pacman::p_load(tidyverse,
                ggridges,
                viridis,
-               dsbox)
+               dsbox,
+               fs,
+               janitor)
 
 ```
 
@@ -73,9 +75,56 @@ Most neighborhoods examined show generally high reviews. The neighborhoods with 
 
 ## 2 - Foreign Connected PACs
 
-```{r}
-#| label: label-me-2
+### Load Data
 
+```{r}
+# get a list of files with "Foreign Connected PAC" in their names
+list_of_files <- dir_ls(path = "data", regexp = "Foreign Connected PAC")
+
+# read all files and row bind them
+# keeping track of the file name in a new column called year
+pac <- read_csv(list_of_files, id = "year")
+
+```
+
+### Clean Data
+
+```{r}
+pac_year <- pac |>
+  # clean headers
+  clean_names() |>
+  # strip chars before year range and .csv
+  mutate(year = basename(year) |> str_remove("\\.csv$")) |>
+  # split into year_start and year on the "-" char
+  separate(
+    col     = year,
+    into    = c("year_start", "year"),
+    sep     = "-",
+    convert = TRUE
+  ) |>
+  # drop the year_start column
+  select(-year_start) |>
+  separate(
+    col     = country_of_origin_parent_company,
+    into    = c("country_of_origin", "parent_company"),
+    sep     = "/",
+    convert = TRUE
+  ) |>
+  # now drop negatives
+ filter(
+    !str_detect(dems, "-"),
+    !str_detect(repubs, "-")
+  ) |>
+ # turn dems and repubs inot dbls
+  mutate(
+    dems   = parse_number(dems),
+    repubs = parse_number(repubs)
+  ) |>   
+  # drop the total column
+  select(-total)
+
+pac_year |> 
+  glimpse()
 ```
 
 ## 3 - Median housing prices in the US
