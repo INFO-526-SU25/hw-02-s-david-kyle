@@ -69,6 +69,8 @@ ggplot(edibnb_clean, aes(
 
 ```
 
+Most neighborhoods examined show generally high reviews. The neighborhoods with the highest medians display tighter clusters communicating consistently high guest satisfaction. The lower scored neighborhoods have flatter more spread plots meaning a wider variety of satisfaction. Outliers on the low end of the scale force a lot of white space.
+
 ## 2 - Foreign Connected PACs
 
 ```{r}
