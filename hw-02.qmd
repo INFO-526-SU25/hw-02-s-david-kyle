@@ -20,7 +20,8 @@ pacman::p_load(tidyverse,
                viridis,
                dsbox,
                fs,
-               janitor)
+               janitor,
+               scales)
 
 ```
 
@@ -110,7 +111,7 @@ pac_year <- pac |>
     sep     = "/",
     convert = TRUE
   ) |>
-  # now drop negatives
+  # now drop negatives. I don't know what a negative would mean in this context
  filter(
     !str_detect(dems, "-"),
     !str_detect(repubs, "-")
@@ -125,6 +126,92 @@ pac_year <- pac |>
 
 pac_year |> 
   glimpse()
+```
+
+### Pivoting data
+
+```{r}
+pac_long <- pac_year |>
+  pivot_longer(
+    cols      = c(dems, repubs),
+    names_to  = "party",
+    values_to = "amount"
+  ) |>
+  mutate(
+    party = recode(party,
+                   dems   = "Democrat",
+                   repubs = "Republican")
+  )
+
+pac_long |> 
+  glimpse()
+```
+
+### Summarize for the UK
+
+```{r}
+uk_summary <- pac_long |>
+  filter(country_of_origin == "UK") |>
+  group_by(year, party) |>
+  summarise(
+    total_amount = sum(amount, na.rm = TRUE),
+    .groups      = "drop"
+  ) |>
+  arrange(year, party)
+
+uk_summary
+```
+
+### Recreate Plot
+
+```{r}
+max_year     <- max(uk_summary$year)
+lower_bound  <- 1e6 * 0.8  
+
+ggplot(uk_summary, aes(x = year, y = total_amount, color = party)) +
+  geom_line(size = 1.2) +
+  scale_color_manual(values = c(Democrat = "blue", Republican = "red")) +
+  scale_x_continuous(
+    limits = c(2000, max_year),
+    breaks = seq(2000, max_year, by = 5)
+  ) +
+  scale_y_continuous(
+    labels = dollar_format(scale = 1e-6, suffix = "M"),
+    limits = c(lower_bound, max(uk_summary$total_amount)),
+    expand = c(0, 0)
+  ) +
+  labs(
+    # single‐line title, no explicit newline
+    title   = "Contributions to US Political Parties from UK-Connected PACs",
+    x       = "Year",
+    y       = "Total amount",
+    caption = "Source: OpenSecrets.org"
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_minimal() +
+  theme(
+    plot.title.position = "plot",
+    plot.title          = element_text(
+                            hjust = 0.3,
+                            size  = 14,
+                            margin = margin(b = 10)  # a bit of space below
+                          ),
+    axis.title.x.position = "plot",
+    axis.title.x          = element_text(hjust = 0),
+    axis.title.y.position = "plot",
+    axis.title.y          = element_text(
+                            angle = 90,
+                            vjust = 1,
+                            hjust = 0
+                          ),
+    legend.position     = c(0.85, 0.15),
+    legend.background   = element_rect(fill = alpha("white", 0.6), color = NA),
+    legend.title        = element_blank(),
+    plot.margin         = margin(t = 5, r = 5, b = 5, l = 40)
+  )
+
+
+
 ```
 
 ## 3 - Median housing prices in the US
