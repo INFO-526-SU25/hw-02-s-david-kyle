@@ -263,7 +263,7 @@ ggplot(ca_summary, aes(year, total_amount, color = party)) +
   )
 ```
 
-#### Interpretation 
+#### Interpretation
 
 Canada-connected PACs ramp up around every federal election, briefly lean Democratic in 2008–2010, then shift to a strong Republican advantage through the 2010s. Overall, there has been a sharp increase in overall spending by both parties.
 
@@ -432,7 +432,94 @@ ggplot() +
 
 ```
 
-###  
+### Subset of median_housing For 2019 and 2020
+
+```{r}
+med_qtr <- median_housing2 |>
+  # derive year and quarter
+  mutate(
+    year    = year(date),
+    quarter = paste0("Q", quarter(date))
+  ) |>
+  filter(year %in% c(2019, 2020))
+
+med_qtr |>
+  glimpse()
+```
+
+### Plot
+
+```{r}
+
+# expand the x-axis by a day in each direction so the data points arent clipped
+date_min <- min(med_qtr$date) - days(1)
+date_max <- max(med_qtr$date) + days(1)
+# y-scale
+y_lower  <- 300000    
+y_upper  <- 360000    
+
+ggplot(med_qtr, aes(x = date, y = price)) +
+  # housing price line
+  geom_line(color = "steelblue", size = 1) +
+  geom_point(color = "steelblue", fill = "white", shape = 21, size = 3) +
+  # x-scale by quarter
+  scale_x_date(
+    limits = c(date_min, date_max),
+    breaks = med_qtr$date,
+    labels = med_qtr$quarter,
+    expand = c(0, 0)
+  ) +
+  # y 300k to 360k by 20k
+  scale_y_continuous(
+    limits = c(y_lower, y_upper),
+    breaks = seq(y_lower, y_upper, by = 20000),
+    labels = comma,
+    expand = c(0, 0)
+  ) +
+  # annotate year labels and position them
+  coord_cartesian(clip = "off") +
+  annotate(
+    "text",
+    x     = as.Date("2019-05-15"),
+    y     = -Inf,
+    label = "2019",
+    vjust = 3,
+    size  = 4
+  ) +
+  annotate(
+    "text",
+    x     = as.Date("2020-05-15"),
+    y     = -Inf,
+    label = "2020",
+    vjust = 3,
+    size  = 4
+  ) +
+  
+  labs(
+    title    = "Median sales price of houses sold in the United States",
+    subtitle = "Not seasonally adjusted",
+    x        = NULL,
+    y        = "Dollars"
+  ) +
+  # title & subtitle styling
+  theme_minimal() +
+  theme(
+    panel.grid.major.x  = element_line(color = "grey80"),
+    panel.grid.minor.x  = element_blank(),
+    panel.grid.major.y  = element_line(color = "grey80"),
+    panel.grid.minor.y  = element_blank(),
+    plot.title.position = "plot",
+    plot.title          = element_text(hjust = 0),
+    plot.subtitle       = element_text(face = "bold", hjust = 0),
+    axis.title.y.position = "plot",
+    axis.title.y          = element_text(angle = 90, face = "bold", hjust = 0.5, vjust = 0.5),
+    axis.title.x.position = "plot",
+    axis.title.x          = element_text(hjust = 0),
+    plot.margin           = margin(t = 5, r = 5, b = 25, l = 5)
+  )
+
+
+```
 
 ## 4 - Expect More. Plot More.
 
