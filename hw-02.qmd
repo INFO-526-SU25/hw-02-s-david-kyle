@@ -1,6 +1,6 @@
 ---
 title: "HW 02"
-author: "INSERT YOUR NAME HERE"
+author: "Seldon David Kyle"
 format: 
   html:
     embed-resources: true
@@ -23,11 +23,6 @@ pacman::p_load(tidyverse,
                janitor,
                scales)
 
-```
-
-```{r}
-edibnb |>
-  glimpse()
 ```
 
 ## 1 - A new day, a new plot, a new geom
@@ -124,8 +119,6 @@ pac_year <- pac |>
   # drop the total column
   select(-total)
 
-pac_year |> 
-  glimpse()
 ```
 
 ### Pivoting data
@@ -143,8 +136,7 @@ pac_long <- pac_year |>
                    repubs = "Republican")
   )
 
-pac_long |> 
-  glimpse()
+
 ```
 
 ### Summarize for the UK
@@ -159,7 +151,6 @@ uk_summary <- pac_long |>
   ) |>
   arrange(year, party)
 
-uk_summary
 ```
 
 ### Recreate Plot
@@ -277,6 +268,88 @@ ggplot(ca_summary, aes(year, total_amount, color = party)) +
 Canada-connected PACs ramp up around every federal election, briefly lean Democratic in 2008–2010, then shift to a strong Republican advantage through the 2010s. Overall, there has been a sharp increase in overall spending by both parties.
 
 ## 3 - Median housing prices in the US
+
+### Load Data
+
+```{r}
+median_housing <- read.csv("data/median-housing.csv")
+recessions <- read_csv("data/recessions.csv")
+
+
+```
+
+### Rename and Clean Data
+
+```{r}
+median_housing2 <- median_housing |>
+  # rename columns
+  rename(
+    date  = DATE,
+    price = MSPUS
+  ) |>
+  # parse the date strings into actual Date objects
+  mutate(
+    date = ymd(date)
+  )
+
+# verify
+median_housing2 |> glimpse()
+```
+
+### Create Plot
+
+```{r}
+# compute bounds
+max_date  <- max(median_housing2$date)
+max_price <- max(median_housing2$price, na.rm = TRUE)
+
+ggplot(median_housing2, aes(x = date, y = price)) +
+  geom_line(color = "steelblue", size = 1) +
+  scale_x_date(
+    breaks = seq(as.Date("1965-01-01"), max_date, by = "5 years"),
+    date_labels = "%Y",
+    expand      = c(0, 0)
+  ) +
+  scale_y_continuous(
+    labels = comma,
+    breaks = seq(0, max_price, by = 40000),
+    limits = c(0, max_price),
+    expand = c(0, 0)
+  ) +
+  labs(
+    title    = "Median sales price of houses sold in the United States",
+    subtitle = "Not seasonally adjusted",
+    x        = NULL,
+    y        = "Dollars",
+    caption  = "Sources: Census; HUD"
+  ) +
+  theme_minimal() +
+  theme(
+    # remove vertical grid lines
+    panel.grid.major.x     = element_blank(),
+    panel.grid.minor.x     = element_blank(),
+    # keep horizontal lines
+    panel.grid.major.y     = element_line(color = "grey80"),
+    panel.grid.minor.y     = element_blank(),
+    # title and subtitle
+    plot.title.position    = "plot",
+    plot.title             = element_text(hjust = 0, size = 14),
+    plot.subtitle          = element_text(hjust = 0, size = 10, margin = margin(b = 8), face = "bold"),
+    # center y‐label and make bold
+    axis.title.y.position  = "plot",
+    axis.title.y           = element_text(angle = 90, hjust = 0.5, vjust = 0.5, face = "bold"),
+    # caption bold and right‐aligned
+    plot.caption           = element_text(hjust = 1, face = "bold"),
+    
+    plot.margin            = margin(t = 5, r = 5, b = 5, l = 5)
+  )
+
+
+
+
+```
+
+###  
 
 ## 4 - Expect More. Plot More.
 

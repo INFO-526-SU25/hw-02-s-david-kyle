@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="INSERT YOUR NAME HERE">
+<meta name="author" content="Seldon David Kyle">
 
 <title>HW 02</title>
 <style>
@@ -2189,7 +2189,13 @@ vertical-align: -.125em;
   <li><a href="#recreate-plot" id="toc-recreate-plot" class="nav-link" data-scroll-target="#recreate-plot">Recreate Plot</a></li>
   <li><a href="#recreate-plot-for-canada" id="toc-recreate-plot-for-canada" class="nav-link" data-scroll-target="#recreate-plot-for-canada">Recreate Plot For Canada</a></li>
   </ul></li>
-  <li><a href="#median-housing-prices-in-the-us" id="toc-median-housing-prices-in-the-us" class="nav-link" data-scroll-target="#median-housing-prices-in-the-us">3 - Median housing prices in the US</a></li>
+  <li><a href="#median-housing-prices-in-the-us" id="toc-median-housing-prices-in-the-us" class="nav-link" data-scroll-target="#median-housing-prices-in-the-us">3 - Median housing prices in the US</a>
+  <ul class="collapse">
+  <li><a href="#load-data-1" id="toc-load-data-1" class="nav-link" data-scroll-target="#load-data-1">Load Data</a></li>
+  <li><a href="#rename-and-clean-data" id="toc-rename-and-clean-data" class="nav-link" data-scroll-target="#rename-and-clean-data">Rename and Clean Data</a></li>
+  <li><a href="#create-plot" id="toc-create-plot" class="nav-link" data-scroll-target="#create-plot">Create Plot</a></li>
+  <li><a href="#section" id="toc-section" class="nav-link" data-scroll-target="#section"></a></li>
+  </ul></li>
   <li><a href="#expect-more.-plot-more." id="toc-expect-more.-plot-more." class="nav-link" data-scroll-target="#expect-more.-plot-more.">4 - Expect More. Plot More.</a></li>
   <li><a href="#mirror-mirror-on-the-wall-whos-the-ugliest-of-them-all" id="toc-mirror-mirror-on-the-wall-whos-the-ugliest-of-them-all" class="nav-link" data-scroll-target="#mirror-mirror-on-the-wall-whos-the-ugliest-of-them-all">5 - Mirror, mirror on the wall, who’s the ugliest of them all?</a></li>
   </ul>
@@ -2209,7 +2215,7 @@ vertical-align: -.125em;
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>INSERT YOUR NAME HERE </p>
+             <p>Seldon David Kyle </p>
           </div>
   </div>
     
@@ -2222,60 +2228,42 @@ vertical-align: -.125em;
 </header>
 
 
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>edibnb <span class="sc">|&gt;</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glimpse</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Rows: 13,245
-Columns: 10
-$ id                   &lt;dbl&gt; 15420, 24288, 38628, 44552, 47616, 48645, 51505, …
-$ price                &lt;dbl&gt; 80, 115, 46, 32, 100, 71, 175, 150, 139, 190, 85,…
-$ neighbourhood        &lt;chr&gt; &quot;New Town&quot;, &quot;Southside&quot;, NA, &quot;Leith&quot;, &quot;Southside&quot;…
-$ accommodates         &lt;dbl&gt; 2, 4, 2, 2, 2, 3, 5, 5, 6, 10, 2, 4, 3, 2, 2, 4, …
-$ bathrooms            &lt;dbl&gt; 1.0, 1.5, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 2.0,…
-$ bedrooms             &lt;dbl&gt; 1, 2, 0, 1, 1, 1, 2, 3, 4, 4, 1, 1, 1, 1, 1, 2, 1…
-$ beds                 &lt;dbl&gt; 1, 2, 2, 1, 1, 2, 3, 4, 5, 7, 1, 1, 1, 1, 1, 2, 1…
-$ review_scores_rating &lt;dbl&gt; 99, 92, 94, 93, 98, 97, 100, 92, 96, 99, 77, 98, …
-$ number_of_reviews    &lt;dbl&gt; 283, 199, 52, 184, 32, 762, 7, 28, 222, 142, 14, …
-$ listing_url          &lt;chr&gt; &quot;https://www.airbnb.com/rooms/15420&quot;, &quot;https://ww…</code></pre>
-</div>
-</div>
 <section id="a-new-day-a-new-plot-a-new-geom" class="level2">
 <h2 class="anchored" data-anchor-id="a-new-day-a-new-plot-a-new-geom">1 - A new day, a new plot, a new geom</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># filter and reorder</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>edibnb_clean <span class="ot">&lt;-</span> dsbox<span class="sc">::</span>edibnb <span class="sc">|&gt;</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(review_scores_rating), <span class="sc">!</span><span class="fu">is.na</span>(neighbourhood)) <span class="sc">|&gt;</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">neighbourhood_ordered =</span> <span class="fu">fct_reorder</span>(</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>      neighbourhood,</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>      review_scores_rating,</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">.fun  =</span> median</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co"># plot</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(edibnb_clean, <span class="fu">aes</span>(</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> review_scores_rating,</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> neighbourhood_ordered</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density_ridges</span>(</span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill  =</span> <span class="st">&quot;steelblue&quot;</span>,</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">&quot;white&quot;</span>,</span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.7</span>,</span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">scale =</span> <span class="fl">1.3</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">title   =</span> <span class="st">&quot;Airbnb Review Scores by Edinburgh Neighborhood&quot;</span>,</span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">x       =</span> <span class="st">&quot;Review Score&quot;</span>,</span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">y       =</span> <span class="st">&quot;Neighborhood (highest median at top)&quot;</span>,</span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Source: edibnb from the dsbox library&quot;</span></span>
-<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_ridges</span>(<span class="at">grid =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
-<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title      =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="dv">0</span>),  <span class="co"># left align</span></span>
-<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># filter and reorder</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>edibnb_clean <span class="ot">&lt;-</span> dsbox<span class="sc">::</span>edibnb <span class="sc">|&gt;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(review_scores_rating), <span class="sc">!</span><span class="fu">is.na</span>(neighbourhood)) <span class="sc">|&gt;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">neighbourhood_ordered =</span> <span class="fu">fct_reorder</span>(</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>      neighbourhood,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>      review_scores_rating,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>      <span class="at">.fun  =</span> median</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># plot</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(edibnb_clean, <span class="fu">aes</span>(</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> review_scores_rating,</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> neighbourhood_ordered</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>  )) <span class="sc">+</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density_ridges</span>(</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">fill  =</span> <span class="st">&quot;steelblue&quot;</span>,</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">&quot;white&quot;</span>,</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.7</span>,</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">scale =</span> <span class="fl">1.3</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>    <span class="at">title   =</span> <span class="st">&quot;Airbnb Review Scores by Edinburgh Neighborhood&quot;</span>,</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>    <span class="at">x       =</span> <span class="st">&quot;Review Score&quot;</span>,</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">y       =</span> <span class="st">&quot;Neighborhood (highest median at top)&quot;</span>,</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Source: edibnb from the dsbox library&quot;</span></span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_ridges</span>(<span class="at">grid =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title      =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="dv">0</span>),  <span class="co"># left align</span></span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Picking joint bandwidth of 1.23</code></pre>
 </div>
@@ -2294,12 +2282,12 @@ $ listing_url          &lt;chr&gt; &quot;https://www.airbnb.com/rooms/15420&quot
 <section id="load-data" class="level3">
 <h3 class="anchored" data-anchor-id="load-data">Load Data</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get a list of files with &quot;Foreign Connected PAC&quot; in their names</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>list_of_files <span class="ot">&lt;-</span> <span class="fu">dir_ls</span>(<span class="at">path =</span> <span class="st">&quot;data&quot;</span>, <span class="at">regexp =</span> <span class="st">&quot;Foreign Connected PAC&quot;</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># read all files and row bind them</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co"># keeping track of the file name in a new column called year</span></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>pac <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(list_of_files, <span class="at">id =</span> <span class="st">&quot;year&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># get a list of files with &quot;Foreign Connected PAC&quot; in their names</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>list_of_files <span class="ot">&lt;-</span> <span class="fu">dir_ls</span>(<span class="at">path =</span> <span class="st">&quot;data&quot;</span>, <span class="at">regexp =</span> <span class="st">&quot;Foreign Connected PAC&quot;</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># read all files and row bind them</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="co"># keeping track of the file name in a new column called year</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>pac <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(list_of_files, <span class="at">id =</span> <span class="st">&quot;year&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Rows: 2394 Columns: 6
 ── Column specification ────────────────────────────────────────────────────────
@@ -2314,164 +2302,121 @@ chr (5): PAC Name (Affiliate), Country of Origin/Parent Company, Total, Dems...
 <section id="clean-data" class="level3">
 <h3 class="anchored" data-anchor-id="clean-data">Clean Data</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pac_year <span class="ot">&lt;-</span> pac <span class="sc">|&gt;</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># clean headers</span></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clean_names</span>() <span class="sc">|&gt;</span></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># strip chars before year range and .csv</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">basename</span>(year) <span class="sc">|&gt;</span> <span class="fu">str_remove</span>(<span class="st">&quot;</span><span class="sc">\\</span><span class="st">.csv$&quot;</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># split into year_start and year on the &quot;-&quot; char</span></span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">col     =</span> year,</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">into    =</span> <span class="fu">c</span>(<span class="st">&quot;year_start&quot;</span>, <span class="st">&quot;year&quot;</span>),</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">sep     =</span> <span class="st">&quot;-&quot;</span>,</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">convert =</span> <span class="cn">TRUE</span></span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># drop the year_start column</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>year_start) <span class="sc">|&gt;</span></span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(</span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">col     =</span> country_of_origin_parent_company,</span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">into    =</span> <span class="fu">c</span>(<span class="st">&quot;country_of_origin&quot;</span>, <span class="st">&quot;parent_company&quot;</span>),</span>
-<span id="cb7-18"><a href="#cb7-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">sep     =</span> <span class="st">&quot;/&quot;</span>,</span>
-<span id="cb7-19"><a href="#cb7-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">convert =</span> <span class="cn">TRUE</span></span>
-<span id="cb7-20"><a href="#cb7-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb7-21"><a href="#cb7-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># now drop negatives. I don&#39;t know what a negative would mean in this context</span></span>
-<span id="cb7-22"><a href="#cb7-22" aria-hidden="true" tabindex="-1"></a> <span class="fu">filter</span>(</span>
-<span id="cb7-23"><a href="#cb7-23" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">str_detect</span>(dems, <span class="st">&quot;-&quot;</span>),</span>
-<span id="cb7-24"><a href="#cb7-24" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">str_detect</span>(repubs, <span class="st">&quot;-&quot;</span>)</span>
-<span id="cb7-25"><a href="#cb7-25" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb7-26"><a href="#cb7-26" aria-hidden="true" tabindex="-1"></a> <span class="co"># turn dems and repubs inot dbls</span></span>
-<span id="cb7-27"><a href="#cb7-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb7-28"><a href="#cb7-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">dems   =</span> <span class="fu">parse_number</span>(dems),</span>
-<span id="cb7-29"><a href="#cb7-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">repubs =</span> <span class="fu">parse_number</span>(repubs)</span>
-<span id="cb7-30"><a href="#cb7-30" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span>   </span>
-<span id="cb7-31"><a href="#cb7-31" aria-hidden="true" tabindex="-1"></a>  <span class="co"># drop the total column</span></span>
-<span id="cb7-32"><a href="#cb7-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>total)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>pac_year <span class="ot">&lt;-</span> pac <span class="sc">|&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># clean headers</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">clean_names</span>() <span class="sc">|&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># strip chars before year range and .csv</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="fu">basename</span>(year) <span class="sc">|&gt;</span> <span class="fu">str_remove</span>(<span class="st">&quot;</span><span class="sc">\\</span><span class="st">.csv$&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="co"># split into year_start and year on the &quot;-&quot; char</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">col     =</span> year,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">into    =</span> <span class="fu">c</span>(<span class="st">&quot;year_start&quot;</span>, <span class="st">&quot;year&quot;</span>),</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">sep     =</span> <span class="st">&quot;-&quot;</span>,</span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">convert =</span> <span class="cn">TRUE</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># drop the year_start column</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>year_start) <span class="sc">|&gt;</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">separate</span>(</span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">col     =</span> country_of_origin_parent_company,</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">into    =</span> <span class="fu">c</span>(<span class="st">&quot;country_of_origin&quot;</span>, <span class="st">&quot;parent_company&quot;</span>),</span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">sep     =</span> <span class="st">&quot;/&quot;</span>,</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">convert =</span> <span class="cn">TRUE</span></span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>  <span class="co"># now drop negatives. I don&#39;t know what a negative would mean in this context</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a> <span class="fu">filter</span>(</span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">str_detect</span>(dems, <span class="st">&quot;-&quot;</span>),</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>    <span class="sc">!</span><span class="fu">str_detect</span>(repubs, <span class="st">&quot;-&quot;</span>)</span>
+<span id="cb5-25"><a href="#cb5-25" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb5-26"><a href="#cb5-26" aria-hidden="true" tabindex="-1"></a> <span class="co"># turn dems and repubs inot dbls</span></span>
+<span id="cb5-27"><a href="#cb5-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb5-28"><a href="#cb5-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">dems   =</span> <span class="fu">parse_number</span>(dems),</span>
+<span id="cb5-29"><a href="#cb5-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">repubs =</span> <span class="fu">parse_number</span>(repubs)</span>
+<span id="cb5-30"><a href="#cb5-30" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span>   </span>
+<span id="cb5-31"><a href="#cb5-31" aria-hidden="true" tabindex="-1"></a>  <span class="co"># drop the total column</span></span>
+<span id="cb5-32"><a href="#cb5-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span>total)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Expected 2 pieces. Additional pieces discarded in 18 rows [125, 349, 552, 732,
 910, 930, 1124, 1149, 1357, 1386, 1595, 1623, 1845, 1874, 2080, 2102, 2302,
 2321].</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>pac_year <span class="sc">|&gt;</span> </span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glimpse</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Rows: 2,376
-Columns: 6
-$ year               &lt;int&gt; 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 200…
-$ pac_name_affiliate &lt;chr&gt; &quot;7-Eleven&quot;, &quot;ABB Group&quot;, &quot;Accenture&quot;, &quot;ACE INA&quot;, &quot;A…
-$ country_of_origin  &lt;chr&gt; &quot;Japan&quot;, &quot;Switzerland&quot;, &quot;UK&quot;, &quot;UK&quot;, &quot;Germany&quot;, &quot;Ger…
-$ parent_company     &lt;chr&gt; &quot;Ito-Yokado&quot;, &quot;Asea Brown Boveri&quot;, &quot;Accenture plc&quot;,…
-$ dems               &lt;dbl&gt; 1500, 17000, 23000, 12500, 2000, 10000, 10000, 1050…
-$ repubs             &lt;dbl&gt; 7000, 28500, 52984, 26000, 0, 500, 14000, 47750, 15…</code></pre>
 </div>
 </div>
 </section>
 <section id="pivoting-data" class="level3">
 <h3 class="anchored" data-anchor-id="pivoting-data">Pivoting data</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>pac_long <span class="ot">&lt;-</span> pac_year <span class="sc">|&gt;</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols      =</span> <span class="fu">c</span>(dems, repubs),</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to  =</span> <span class="st">&quot;party&quot;</span>,</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">&quot;amount&quot;</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">party =</span> <span class="fu">recode</span>(party,</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>                   <span class="at">dems   =</span> <span class="st">&quot;Democrat&quot;</span>,</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>                   <span class="at">repubs =</span> <span class="st">&quot;Republican&quot;</span>)</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>pac_long <span class="sc">|&gt;</span> </span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glimpse</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Rows: 4,752
-Columns: 6
-$ year               &lt;int&gt; 2000, 2000, 2000, 2000, 2000, 2000, 2000, 2000, 200…
-$ pac_name_affiliate &lt;chr&gt; &quot;7-Eleven&quot;, &quot;7-Eleven&quot;, &quot;ABB Group&quot;, &quot;ABB Group&quot;, &quot;…
-$ country_of_origin  &lt;chr&gt; &quot;Japan&quot;, &quot;Japan&quot;, &quot;Switzerland&quot;, &quot;Switzerland&quot;, &quot;UK…
-$ parent_company     &lt;chr&gt; &quot;Ito-Yokado&quot;, &quot;Ito-Yokado&quot;, &quot;Asea Brown Boveri&quot;, &quot;A…
-$ party              &lt;chr&gt; &quot;Democrat&quot;, &quot;Republican&quot;, &quot;Democrat&quot;, &quot;Republican&quot;,…
-$ amount             &lt;dbl&gt; 1500, 7000, 17000, 28500, 23000, 52984, 12500, 2600…</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>pac_long <span class="ot">&lt;-</span> pac_year <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols      =</span> <span class="fu">c</span>(dems, repubs),</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_to  =</span> <span class="st">&quot;party&quot;</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">&quot;amount&quot;</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">party =</span> <span class="fu">recode</span>(party,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>                   <span class="at">dems   =</span> <span class="st">&quot;Democrat&quot;</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>                   <span class="at">repubs =</span> <span class="st">&quot;Republican&quot;</span>)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="summarize-for-the-uk" class="level3">
 <h3 class="anchored" data-anchor-id="summarize-for-the-uk">Summarize for the UK</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>uk_summary <span class="ot">&lt;-</span> pac_long <span class="sc">|&gt;</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(country_of_origin <span class="sc">==</span> <span class="st">&quot;UK&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, party) <span class="sc">|&gt;</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_amount =</span> <span class="fu">sum</span>(amount, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups      =</span> <span class="st">&quot;drop&quot;</span></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(year, party)</span>
-<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>uk_summary</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 24 × 3
-    year party      total_amount
-   &lt;int&gt; &lt;chr&gt;             &lt;dbl&gt;
- 1  2000 Democrat         978725
- 2  2000 Republican      2057518
- 3  2002 Democrat        1046683
- 4  2002 Republican      2006272
- 5  2004 Democrat        1188801
- 6  2004 Republican      2311101
- 7  2006 Democrat        1543755
- 8  2006 Republican      3057736
- 9  2008 Democrat        2690413
-10  2008 Republican      2842956
-# ℹ 14 more rows</code></pre>
-</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>uk_summary <span class="ot">&lt;-</span> pac_long <span class="sc">|&gt;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(country_of_origin <span class="sc">==</span> <span class="st">&quot;UK&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, party) <span class="sc">|&gt;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_amount =</span> <span class="fu">sum</span>(amount, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups      =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(year, party)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="recreate-plot" class="level3">
 <h3 class="anchored" data-anchor-id="recreate-plot">Recreate Plot</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>max_year     <span class="ot">&lt;-</span> <span class="fu">max</span>(uk_summary<span class="sc">$</span>year)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>lower_bound  <span class="ot">&lt;-</span> <span class="fl">1e6</span> <span class="sc">*</span> <span class="fl">0.8</span>  </span>
-<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(uk_summary, <span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> total_amount, <span class="at">color =</span> party)) <span class="sc">+</span></span>
-<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
-<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="at">Democrat =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">Republican =</span> <span class="st">&quot;red&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(</span>
-<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">2000</span>, max_year),</span>
-<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">2000</span>, max_year, <span class="at">by =</span> <span class="dv">5</span>)</span>
-<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
-<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">dollar_format</span>(<span class="at">scale =</span> <span class="fl">1e-6</span>, <span class="at">suffix =</span> <span class="st">&quot;M&quot;</span>),</span>
-<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">limits =</span> <span class="fu">c</span>(lower_bound, <span class="fu">max</span>(uk_summary<span class="sc">$</span>total_amount)),</span>
-<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)</span>
-<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># single‐line title, no explicit newline</span></span>
-<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">title   =</span> <span class="st">&quot;Contributions to US Political Parties from UK-Connected PACs&quot;</span>,</span>
-<span id="cb15-19"><a href="#cb15-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">x       =</span> <span class="st">&quot;Year&quot;</span>,</span>
-<span id="cb15-20"><a href="#cb15-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">y       =</span> <span class="st">&quot;Total amount&quot;</span>,</span>
-<span id="cb15-21"><a href="#cb15-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Source: OpenSecrets.org&quot;</span></span>
-<span id="cb15-22"><a href="#cb15-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb15-23"><a href="#cb15-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">clip =</span> <span class="st">&quot;off&quot;</span>) <span class="sc">+</span></span>
-<span id="cb15-24"><a href="#cb15-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb15-25"><a href="#cb15-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb15-26"><a href="#cb15-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title.position =</span> <span class="st">&quot;plot&quot;</span>,</span>
-<span id="cb15-27"><a href="#cb15-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title          =</span> <span class="fu">element_text</span>(</span>
-<span id="cb15-28"><a href="#cb15-28" aria-hidden="true" tabindex="-1"></a>                            <span class="at">hjust =</span> <span class="fl">0.3</span>,</span>
-<span id="cb15-29"><a href="#cb15-29" aria-hidden="true" tabindex="-1"></a>                            <span class="at">size  =</span> <span class="dv">14</span>,</span>
-<span id="cb15-30"><a href="#cb15-30" aria-hidden="true" tabindex="-1"></a>                            <span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">b =</span> <span class="dv">10</span>)  <span class="co"># a bit of space below</span></span>
-<span id="cb15-31"><a href="#cb15-31" aria-hidden="true" tabindex="-1"></a>                          ),</span>
-<span id="cb15-32"><a href="#cb15-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x.position =</span> <span class="st">&quot;plot&quot;</span>,</span>
-<span id="cb15-33"><a href="#cb15-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x          =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="dv">0</span>),</span>
-<span id="cb15-34"><a href="#cb15-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y.position =</span> <span class="st">&quot;plot&quot;</span>,</span>
-<span id="cb15-35"><a href="#cb15-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y          =</span> <span class="fu">element_text</span>(</span>
-<span id="cb15-36"><a href="#cb15-36" aria-hidden="true" tabindex="-1"></a>                            <span class="at">angle =</span> <span class="dv">90</span>,</span>
-<span id="cb15-37"><a href="#cb15-37" aria-hidden="true" tabindex="-1"></a>                            <span class="at">vjust =</span> <span class="dv">1</span>,</span>
-<span id="cb15-38"><a href="#cb15-38" aria-hidden="true" tabindex="-1"></a>                            <span class="at">hjust =</span> <span class="dv">0</span></span>
-<span id="cb15-39"><a href="#cb15-39" aria-hidden="true" tabindex="-1"></a>                          ),</span>
-<span id="cb15-40"><a href="#cb15-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position     =</span> <span class="fu">c</span>(<span class="fl">0.85</span>, <span class="fl">0.15</span>),</span>
-<span id="cb15-41"><a href="#cb15-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.background   =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="fu">alpha</span>(<span class="st">&quot;white&quot;</span>, <span class="fl">0.6</span>), <span class="at">color =</span> <span class="cn">NA</span>),</span>
-<span id="cb15-42"><a href="#cb15-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title        =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb15-43"><a href="#cb15-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin         =</span> <span class="fu">margin</span>(<span class="at">t =</span> <span class="dv">5</span>, <span class="at">r =</span> <span class="dv">5</span>, <span class="at">b =</span> <span class="dv">5</span>, <span class="at">l =</span> <span class="dv">40</span>)</span>
-<span id="cb15-44"><a href="#cb15-44" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>max_year     <span class="ot">&lt;-</span> <span class="fu">max</span>(uk_summary<span class="sc">$</span>year)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>lower_bound  <span class="ot">&lt;-</span> <span class="fl">1e6</span> <span class="sc">*</span> <span class="fl">0.8</span>  </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(uk_summary, <span class="fu">aes</span>(<span class="at">x =</span> year, <span class="at">y =</span> total_amount, <span class="at">color =</span> party)) <span class="sc">+</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="at">Democrat =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">Republican =</span> <span class="st">&quot;red&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">2000</span>, max_year),</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">2000</span>, max_year, <span class="at">by =</span> <span class="dv">5</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">dollar_format</span>(<span class="at">scale =</span> <span class="fl">1e-6</span>, <span class="at">suffix =</span> <span class="st">&quot;M&quot;</span>),</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">limits =</span> <span class="fu">c</span>(lower_bound, <span class="fu">max</span>(uk_summary<span class="sc">$</span>total_amount)),</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># single‐line title, no explicit newline</span></span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">title   =</span> <span class="st">&quot;Contributions to US Political Parties from UK-Connected PACs&quot;</span>,</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">x       =</span> <span class="st">&quot;Year&quot;</span>,</span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">y       =</span> <span class="st">&quot;Total amount&quot;</span>,</span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Source: OpenSecrets.org&quot;</span></span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">clip =</span> <span class="st">&quot;off&quot;</span>) <span class="sc">+</span></span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title.position =</span> <span class="st">&quot;plot&quot;</span>,</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title          =</span> <span class="fu">element_text</span>(</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>                            <span class="at">hjust =</span> <span class="fl">0.3</span>,</span>
+<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>                            <span class="at">size  =</span> <span class="dv">14</span>,</span>
+<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>                            <span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">b =</span> <span class="dv">10</span>)  <span class="co"># a bit of space below</span></span>
+<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>                          ),</span>
+<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x.position =</span> <span class="st">&quot;plot&quot;</span>,</span>
+<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x          =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="dv">0</span>),</span>
+<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y.position =</span> <span class="st">&quot;plot&quot;</span>,</span>
+<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y          =</span> <span class="fu">element_text</span>(</span>
+<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>                            <span class="at">angle =</span> <span class="dv">90</span>,</span>
+<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a>                            <span class="at">vjust =</span> <span class="dv">1</span>,</span>
+<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>                            <span class="at">hjust =</span> <span class="dv">0</span></span>
+<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>                          ),</span>
+<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position     =</span> <span class="fu">c</span>(<span class="fl">0.85</span>, <span class="fl">0.15</span>),</span>
+<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.background   =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="fu">alpha</span>(<span class="st">&quot;white&quot;</span>, <span class="fl">0.6</span>), <span class="at">color =</span> <span class="cn">NA</span>),</span>
+<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title        =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin         =</span> <span class="fu">margin</span>(<span class="at">t =</span> <span class="dv">5</span>, <span class="at">r =</span> <span class="dv">5</span>, <span class="at">b =</span> <span class="dv">5</span>, <span class="at">l =</span> <span class="dv">40</span>)</span>
+<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
 ℹ Please use `linewidth` instead.</code></pre>
@@ -2501,17 +2446,17 @@ hierarchy.</code></pre>
 <section id="recreate-plot-for-canada" class="level3">
 <h3 class="anchored" data-anchor-id="recreate-plot-for-canada">Recreate Plot For Canada</h3>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>ca_summary <span class="ot">&lt;-</span> pac_long <span class="sc">|&gt;</span></span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(country_of_origin <span class="sc">==</span> <span class="st">&quot;Canada&quot;</span>) <span class="sc">|&gt;</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, party) <span class="sc">|&gt;</span></span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_amount =</span> <span class="fu">sum</span>(amount, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups      =</span> <span class="st">&quot;drop&quot;</span></span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(year, party)</span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>ca_summary <span class="sc">|&gt;</span></span>
-<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glimpse</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>ca_summary <span class="ot">&lt;-</span> pac_long <span class="sc">|&gt;</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(country_of_origin <span class="sc">==</span> <span class="st">&quot;Canada&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, party) <span class="sc">|&gt;</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">total_amount =</span> <span class="fu">sum</span>(amount, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">.groups      =</span> <span class="st">&quot;drop&quot;</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(year, party)</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>ca_summary <span class="sc">|&gt;</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glimpse</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 24
 Columns: 3
@@ -2521,44 +2466,44 @@ $ total_amount &lt;dbl&gt; 66890, 137425, 92475, 118900, 99000, 175025, 116037, 
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>min_amt    <span class="ot">&lt;-</span> <span class="fu">min</span>(ca_summary<span class="sc">$</span>total_amount)</span>
-<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>max_year   <span class="ot">&lt;-</span> <span class="fu">max</span>(ca_summary<span class="sc">$</span>year)</span>
-<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>max_amt    <span class="ot">&lt;-</span> <span class="fu">max</span>(ca_summary<span class="sc">$</span>total_amount)</span>
-<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>lower_bound <span class="ot">&lt;-</span> min_amt <span class="sc">*</span> <span class="fl">0.95</span>  <span class="co"># 5% below the smallest value</span></span>
-<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ca_summary, <span class="fu">aes</span>(year, total_amount, <span class="at">color =</span> party)) <span class="sc">+</span></span>
-<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
-<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="at">Democrat =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">Republican =</span> <span class="st">&quot;red&quot;</span>)) <span class="sc">+</span></span>
-<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(</span>
-<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">2000</span>, max_year),</span>
-<span id="cb22-12"><a href="#cb22-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">2000</span>, max_year, <span class="at">by =</span> <span class="dv">5</span>)</span>
-<span id="cb22-13"><a href="#cb22-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb22-14"><a href="#cb22-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
-<span id="cb22-15"><a href="#cb22-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">dollar_format</span>(<span class="at">scale =</span> <span class="fl">1e-6</span>, <span class="at">suffix =</span> <span class="st">&quot;M&quot;</span>),</span>
-<span id="cb22-16"><a href="#cb22-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">limits =</span> <span class="fu">c</span>(lower_bound, max_amt),</span>
-<span id="cb22-17"><a href="#cb22-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)</span>
-<span id="cb22-18"><a href="#cb22-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb22-19"><a href="#cb22-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb22-20"><a href="#cb22-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">title   =</span> <span class="st">&quot;Contributions to US Political Parties from Canada-Connected PACs&quot;</span>,</span>
-<span id="cb22-21"><a href="#cb22-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">x       =</span> <span class="st">&quot;Year&quot;</span>,</span>
-<span id="cb22-22"><a href="#cb22-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">y       =</span> <span class="st">&quot;Total amount&quot;</span>,</span>
-<span id="cb22-23"><a href="#cb22-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Source: OpenSecrets.org&quot;</span></span>
-<span id="cb22-24"><a href="#cb22-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
-<span id="cb22-25"><a href="#cb22-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">clip =</span> <span class="st">&quot;off&quot;</span>) <span class="sc">+</span></span>
-<span id="cb22-26"><a href="#cb22-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb22-27"><a href="#cb22-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
-<span id="cb22-28"><a href="#cb22-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title.position    =</span> <span class="st">&quot;plot&quot;</span>,</span>
-<span id="cb22-29"><a href="#cb22-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title             =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">size =</span> <span class="dv">12</span>),</span>
-<span id="cb22-30"><a href="#cb22-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x.position  =</span> <span class="st">&quot;plot&quot;</span>,</span>
-<span id="cb22-31"><a href="#cb22-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x           =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="dv">0</span>),</span>
-<span id="cb22-32"><a href="#cb22-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y.position  =</span> <span class="st">&quot;plot&quot;</span>,</span>
-<span id="cb22-33"><a href="#cb22-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y           =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="dv">1</span>, <span class="at">hjust =</span> <span class="dv">0</span>),</span>
-<span id="cb22-34"><a href="#cb22-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position        =</span> <span class="fu">c</span>(<span class="fl">0.85</span>, <span class="fl">0.15</span>),</span>
-<span id="cb22-35"><a href="#cb22-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.background      =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="fu">alpha</span>(<span class="st">&quot;white&quot;</span>, <span class="fl">0.6</span>), <span class="at">color =</span> <span class="cn">NA</span>),</span>
-<span id="cb22-36"><a href="#cb22-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title           =</span> <span class="fu">element_blank</span>(),</span>
-<span id="cb22-37"><a href="#cb22-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin            =</span> <span class="fu">margin</span>(<span class="at">t =</span> <span class="dv">5</span>, <span class="at">r =</span> <span class="dv">5</span>, <span class="at">b =</span> <span class="dv">5</span>, <span class="at">l =</span> <span class="dv">40</span>)</span>
-<span id="cb22-38"><a href="#cb22-38" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>min_amt    <span class="ot">&lt;-</span> <span class="fu">min</span>(ca_summary<span class="sc">$</span>total_amount)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>max_year   <span class="ot">&lt;-</span> <span class="fu">max</span>(ca_summary<span class="sc">$</span>year)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>max_amt    <span class="ot">&lt;-</span> <span class="fu">max</span>(ca_summary<span class="sc">$</span>total_amount)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>lower_bound <span class="ot">&lt;-</span> min_amt <span class="sc">*</span> <span class="fl">0.95</span>  <span class="co"># 5% below the smallest value</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(ca_summary, <span class="fu">aes</span>(year, total_amount, <span class="at">color =</span> party)) <span class="sc">+</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="fl">1.2</span>) <span class="sc">+</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_color_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="at">Democrat =</span> <span class="st">&quot;blue&quot;</span>, <span class="at">Republican =</span> <span class="st">&quot;red&quot;</span>)) <span class="sc">+</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_continuous</span>(</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">2000</span>, max_year),</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">2000</span>, max_year, <span class="at">by =</span> <span class="dv">5</span>)</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> <span class="fu">dollar_format</span>(<span class="at">scale =</span> <span class="fl">1e-6</span>, <span class="at">suffix =</span> <span class="st">&quot;M&quot;</span>),</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">limits =</span> <span class="fu">c</span>(lower_bound, max_amt),</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">title   =</span> <span class="st">&quot;Contributions to US Political Parties from Canada-Connected PACs&quot;</span>,</span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">x       =</span> <span class="st">&quot;Year&quot;</span>,</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">y       =</span> <span class="st">&quot;Total amount&quot;</span>,</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption =</span> <span class="st">&quot;Source: OpenSecrets.org&quot;</span></span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_cartesian</span>(<span class="at">clip =</span> <span class="st">&quot;off&quot;</span>) <span class="sc">+</span></span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title.position    =</span> <span class="st">&quot;plot&quot;</span>,</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title             =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">size =</span> <span class="dv">12</span>),</span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x.position  =</span> <span class="st">&quot;plot&quot;</span>,</span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.x           =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="dv">0</span>),</span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y.position  =</span> <span class="st">&quot;plot&quot;</span>,</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y           =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="dv">1</span>, <span class="at">hjust =</span> <span class="dv">0</span>),</span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.position        =</span> <span class="fu">c</span>(<span class="fl">0.85</span>, <span class="fl">0.15</span>),</span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.background      =</span> <span class="fu">element_rect</span>(<span class="at">fill =</span> <span class="fu">alpha</span>(<span class="st">&quot;white&quot;</span>, <span class="fl">0.6</span>), <span class="at">color =</span> <span class="cn">NA</span>),</span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">legend.title           =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin            =</span> <span class="fu">margin</span>(<span class="at">t =</span> <span class="dv">5</span>, <span class="at">r =</span> <span class="dv">5</span>, <span class="at">b =</span> <span class="dv">5</span>, <span class="at">l =</span> <span class="dv">40</span>)</span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning in plot_theme(plot): The `axis.title.x.position` theme element is not defined in the element
 hierarchy.</code></pre>
@@ -2583,6 +2528,109 @@ hierarchy.</code></pre>
 </section>
 <section id="median-housing-prices-in-the-us" class="level2">
 <h2 class="anchored" data-anchor-id="median-housing-prices-in-the-us">3 - Median housing prices in the US</h2>
+<section id="load-data-1" class="level3">
+<h3 class="anchored" data-anchor-id="load-data-1">Load Data</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>median_housing <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">&quot;data/median-housing.csv&quot;</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>recessions <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">&quot;data/recessions.csv&quot;</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 34 Columns: 2
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+date (2): Peak, Trough
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+</div>
+</section>
+<section id="rename-and-clean-data" class="level3">
+<h3 class="anchored" data-anchor-id="rename-and-clean-data">Rename and Clean Data</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>median_housing2 <span class="ot">&lt;-</span> median_housing <span class="sc">|&gt;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># rename columns</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">date  =</span> DATE,</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">price =</span> MSPUS</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># parse the date strings into actual Date objects</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">date =</span> <span class="fu">ymd</span>(date)</span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a><span class="co"># verify</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>median_housing2 <span class="sc">|&gt;</span> <span class="fu">glimpse</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 234
+Columns: 2
+$ date  &lt;date&gt; 1963-01-01, 1963-04-01, 1963-07-01, 1963-10-01, 1964-01-01, 196…
+$ price &lt;dbl&gt; 17800, 18000, 17900, 18500, 18500, 18900, 18900, 19400, 20200, 1…</code></pre>
+</div>
+</div>
+</section>
+<section id="create-plot" class="level3">
+<h3 class="anchored" data-anchor-id="create-plot">Create Plot</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="co"># compute bounds</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>max_date  <span class="ot">&lt;-</span> <span class="fu">max</span>(median_housing2<span class="sc">$</span>date)</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>max_price <span class="ot">&lt;-</span> <span class="fu">max</span>(median_housing2<span class="sc">$</span>price, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(median_housing2, <span class="fu">aes</span>(<span class="at">x =</span> date, <span class="at">y =</span> price)) <span class="sc">+</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">&quot;steelblue&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_date</span>(</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="fu">as.Date</span>(<span class="st">&quot;1965-01-01&quot;</span>), max_date, <span class="at">by =</span> <span class="st">&quot;5 years&quot;</span>),</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">date_labels =</span> <span class="st">&quot;%Y&quot;</span>,</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">expand      =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)</span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">labels =</span> comma,</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">breaks =</span> <span class="fu">seq</span>(<span class="dv">0</span>, max_price, <span class="at">by =</span> <span class="dv">40000</span>),</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, max_price),</span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">expand =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">0</span>)</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">title    =</span> <span class="st">&quot;Median sales price of houses sold in the United States&quot;</span>,</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Not seasonally adjusted&quot;</span>,</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>    <span class="at">x        =</span> <span class="cn">NULL</span>,</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>    <span class="at">y        =</span> <span class="st">&quot;Dollars&quot;</span>,</span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">caption  =</span> <span class="st">&quot;Sources: Census; HUD&quot;</span></span>
+<span id="cb23-24"><a href="#cb23-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb23-25"><a href="#cb23-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb23-26"><a href="#cb23-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb23-27"><a href="#cb23-27" aria-hidden="true" tabindex="-1"></a>    <span class="co"># remove vertical grid lines</span></span>
+<span id="cb23-28"><a href="#cb23-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.x     =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb23-29"><a href="#cb23-29" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor.x     =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb23-30"><a href="#cb23-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># keep horizontal lines</span></span>
+<span id="cb23-31"><a href="#cb23-31" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.major.y     =</span> <span class="fu">element_line</span>(<span class="at">color =</span> <span class="st">&quot;grey80&quot;</span>),</span>
+<span id="cb23-32"><a href="#cb23-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">panel.grid.minor.y     =</span> <span class="fu">element_blank</span>(),</span>
+<span id="cb23-33"><a href="#cb23-33" aria-hidden="true" tabindex="-1"></a>    <span class="co"># title and subtitle</span></span>
+<span id="cb23-34"><a href="#cb23-34" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title.position    =</span> <span class="st">&quot;plot&quot;</span>,</span>
+<span id="cb23-35"><a href="#cb23-35" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title             =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">size =</span> <span class="dv">14</span>),</span>
+<span id="cb23-36"><a href="#cb23-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.subtitle          =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="dv">0</span>, <span class="at">size =</span> <span class="dv">10</span>, <span class="at">margin =</span> <span class="fu">margin</span>(<span class="at">b =</span> <span class="dv">8</span>), <span class="at">face =</span> <span class="st">&quot;bold&quot;</span>),</span>
+<span id="cb23-37"><a href="#cb23-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># center y‐label and make bold</span></span>
+<span id="cb23-38"><a href="#cb23-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y.position  =</span> <span class="st">&quot;plot&quot;</span>,</span>
+<span id="cb23-39"><a href="#cb23-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title.y           =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">90</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">vjust =</span> <span class="fl">0.5</span>, <span class="at">face =</span> <span class="st">&quot;bold&quot;</span>),</span>
+<span id="cb23-40"><a href="#cb23-40" aria-hidden="true" tabindex="-1"></a>    <span class="co"># caption bold and right‐aligned</span></span>
+<span id="cb23-41"><a href="#cb23-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.caption           =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">face =</span> <span class="st">&quot;bold&quot;</span>),</span>
+<span id="cb23-42"><a href="#cb23-42" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb23-43"><a href="#cb23-43" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.margin            =</span> <span class="fu">margin</span>(<span class="at">t =</span> <span class="dv">5</span>, <span class="at">r =</span> <span class="dv">5</span>, <span class="at">b =</span> <span class="dv">5</span>, <span class="at">l =</span> <span class="dv">5</span>)</span>
+<span id="cb23-44"><a href="#cb23-44" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in plot_theme(plot): The `axis.title.y.position` theme element is not defined in the element
+hierarchy.</code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img role="img" src="data:image/png;base64,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" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="section" class="level3">
+<h3 class="anchored" data-anchor-id="section"></h3>
+</section>
 </section>
 <section id="expect-more.-plot-more." class="level2">
 <h2 class="anchored" data-anchor-id="expect-more.-plot-more.">4 - Expect More. Plot More.</h2>
