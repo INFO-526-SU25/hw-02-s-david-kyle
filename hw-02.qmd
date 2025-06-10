@@ -304,12 +304,15 @@ max_date  <- max(median_housing2$date)
 max_price <- max(median_housing2$price, na.rm = TRUE)
 
 ggplot(median_housing2, aes(x = date, y = price)) +
+  # housing price line
   geom_line(color = "steelblue", size = 1) +
+  # x starts at 1965, 5-year breaks
   scale_x_date(
     breaks = seq(as.Date("1965-01-01"), max_date, by = "5 years"),
     date_labels = "%Y",
     expand      = c(0, 0)
   ) +
+  # y starts at zero
   scale_y_continuous(
     labels = comma,
     breaks = seq(0, max_price, by = 40000),
@@ -325,26 +328,106 @@ ggplot(median_housing2, aes(x = date, y = price)) +
   ) +
   theme_minimal() +
   theme(
-    # remove vertical grid lines
+    # title & subtitle styling
     panel.grid.major.x     = element_blank(),
     panel.grid.minor.x     = element_blank(),
-    # keep horizontal lines
     panel.grid.major.y     = element_line(color = "grey80"),
     panel.grid.minor.y     = element_blank(),
     # title and subtitle
     plot.title.position    = "plot",
     plot.title             = element_text(hjust = 0, size = 14),
     plot.subtitle          = element_text(hjust = 0, size = 10, margin = margin(b = 8), face = "bold"),
-    # center y‐label and make bold
     axis.title.y.position  = "plot",
     axis.title.y           = element_text(angle = 90, hjust = 0.5, vjust = 0.5, face = "bold"),
-    # caption bold and right‐aligned
+    # captions
     plot.caption           = element_text(hjust = 1, face = "bold"),
     
     plot.margin            = margin(t = 5, r = 5, b = 5, l = 5)
   )
 
 
+
+
+```
+
+### Add Recession Data
+
+```{r}
+# compute the date range covered by your housing data
+min_date <- min(median_housing2$date)
+max_date <- max(median_housing2$date)
+
+# flag recessions whose entire span falls within that range
+recessions_flagged <- recessions |>
+  mutate(
+    in_range = (Peak >= min_date) & (Trough <= max_date)
+  )
+
+rec_in_range <- recessions_flagged |>
+  filter(in_range)
+```
+
+### Plot With Recessions
+
+```{r}
+max_date <- max(median_housing2$date)
+max_price <- max(median_housing2$price, na.rm = TRUE)
+
+ggplot() +
+  # recession shading
+  geom_rect(
+    data = rec_in_range,
+    aes(xmin = Peak, xmax = Trough, ymin = -Inf, ymax = Inf),
+    inherit.aes = FALSE,
+    fill = "grey80",
+    alpha = 0.5
+  ) +
+  # housing price line
+  geom_line(
+    data = median_housing2,
+    aes(x = date, y = price),
+    color = "steelblue",
+    size = 1
+  ) +
+  # x starts at 1965, 5-year breaks
+  scale_x_date(
+    breaks = seq(as.Date("1965-01-01"), max_date, by = "5 years"),
+    date_labels = "%Y",
+    expand      = c(0, 0)
+  ) +
+  # y starts at zero
+  scale_y_continuous(
+    limits = c(0, max_price),
+    breaks = seq(0, max_price, by = 40000),
+    labels = comma,
+    expand = c(0, 0)
+  ) +
+  labs(
+    title    = "Median sales price of houses sold in the United States",
+    subtitle = "Not seasonally adjusted",
+    x        = NULL,
+    y        = "Dollars",
+    caption  = "Sources: Census; HUD"
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_minimal() +
+  theme(
+    # title & subtitle styling
+    plot.title.position   = "plot",
+    plot.title            = element_text(hjust = 0, size = 14),
+    plot.subtitle         = element_text(hjust = 0, size = 10, face = "bold", margin = margin(b = 8)),
+    axis.title.y.position = "plot",
+    axis.title.y          = element_text(angle = 90, hjust = 0.5, vjust = 0.5, face = "bold"),
+    axis.title.x.position = "plot",
+    axis.title.x          = element_text(hjust = 0),
+    panel.grid.major.x    = element_blank(),
+    panel.grid.minor.x    = element_blank(),
+    panel.grid.major.y    = element_line(color = "grey80"),
+    panel.grid.minor.y    = element_blank(),
+    # captions
+    plot.caption          = element_text(hjust = 1, face = "bold"),
+    plot.margin           = margin(t = 5, r = 5, b = 5, l = 5)
+  )
 
 
 ```
