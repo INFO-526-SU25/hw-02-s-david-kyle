@@ -214,6 +214,68 @@ ggplot(uk_summary, aes(x = year, y = total_amount, color = party)) +
 
 ```
 
+### Recreate Plot For Canada
+
+```{r}
+ca_summary <- pac_long |>
+  filter(country_of_origin == "Canada") |>
+  group_by(year, party) |>
+  summarise(
+    total_amount = sum(amount, na.rm = TRUE),
+    .groups      = "drop"
+  ) |>
+  arrange(year, party)
+
+ca_summary |>
+  glimpse()
+
+```
+
+```{r}
+min_amt    <- min(ca_summary$total_amount)
+max_year   <- max(ca_summary$year)
+max_amt    <- max(ca_summary$total_amount)
+
+lower_bound <- min_amt * 0.95  # 5% below the smallest value
+
+ggplot(ca_summary, aes(year, total_amount, color = party)) +
+  geom_line(size = 1.2) +
+  scale_color_manual(values = c(Democrat = "blue", Republican = "red")) +
+  scale_x_continuous(
+    limits = c(2000, max_year),
+    breaks = seq(2000, max_year, by = 5)
+  ) +
+  scale_y_continuous(
+    labels = dollar_format(scale = 1e-6, suffix = "M"),
+    limits = c(lower_bound, max_amt),
+    expand = c(0, 0)
+  ) +
+  labs(
+    title   = "Contributions to US Political Parties from Canada-Connected PACs",
+    x       = "Year",
+    y       = "Total amount",
+    caption = "Source: OpenSecrets.org"
+  ) +
+  coord_cartesian(clip = "off") +
+  theme_minimal() +
+  theme(
+    plot.title.position    = "plot",
+    plot.title             = element_text(hjust = 0, size = 12),
+    axis.title.x.position  = "plot",
+    axis.title.x           = element_text(hjust = 0),
+    axis.title.y.position  = "plot",
+    axis.title.y           = element_text(angle = 90, vjust = 1, hjust = 0),
+    legend.position        = c(0.85, 0.15),
+    legend.background      = element_rect(fill = alpha("white", 0.6), color = NA),
+    legend.title           = element_blank(),
+    plot.margin            = margin(t = 5, r = 5, b = 5, l = 40)
+  )
+```
+
+#### Interpretation 
+
+Canada-connected PACs ramp up around every federal election, briefly lean Democratic in 2008–2010, then shift to a strong Republican advantage through the 2010s. Overall, there has been a sharp increase in overall spending by both parties.
+
 ## 3 - Median housing prices in the US
 
 ## 4 - Expect More. Plot More.
