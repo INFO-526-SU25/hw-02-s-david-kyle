@@ -23,7 +23,8 @@ pacman::p_load(tidyverse,
                janitor,
                scales,
                tibble,
-               ggforce)
+               ggforce,
+               palmerpenguins)
 
 ```
 
@@ -573,3 +574,65 @@ ggplot() +
 Target red sourced from <https://www.brandcolorcode.com/target>
 
 ## 5 - Mirror, mirror on the wall, who’s the ugliest of them all?
+
+```{r}
+penguins2 <- penguins |>
+  filter(!is.na(bill_length_mm), !is.na(bill_depth_mm))
+
+ggplot(penguins2, aes(
+    x     = bill_length_mm,
+    y     = bill_depth_mm,
+    color = species,
+    shape = island
+  )) +
+  scale_color_manual(values = c(
+    Adelie    = "hotpink",
+    Chinstrap = "limegreen",
+    Gentoo    = "cyan"
+  )) +
+  scale_shape_manual(values = c(
+    Biscoe   = 15,
+    Dream    = 17,
+    Torgersen = 18
+  )) +
+  geom_point(size = 3, alpha = 0.8) +
+  labs(
+    title    = "Penguin Bill Dimensions by Species and Island",
+    x        = "Bill length (mm)",
+    y        = "Bill depth (mm)",
+    color    = "Species",
+    shape    = "Island",
+    caption  = "Source: palmerpenguins"
+  ) +
+  theme_minimal() +
+  theme(
+    plot.background   = element_rect(fill = "purple", color = "black", linewidth = 2),
+    panel.background  = element_rect(fill = "lightgreen", color = NA),
+    
+    panel.grid.major  = element_line(color = "orange", linewidth = 2),
+    panel.grid.minor  = element_line(color = "red",
+                                     linewidth = 1, linetype = "dashed"),
+    
+    axis.text.x = element_text(angle = 45, hjust = 1,
+                               color = "blue", size = 14),
+    axis.text.y = element_text(angle = 90, vjust = 0.5,
+                               color = "red", size = 14),
+    
+    axis.title.x = element_text(color = "green", size = 16,
+                                angle = 0, face = "bold"),
+    axis.title.y = element_text(color = "brown", size = 16,
+                                angle = 0, face = "bold.italic"),
+    
+    plot.title    = element_text(hjust = 1, size = 24,
+                                 color = "red", face = "bold"),
+    plot.subtitle = element_text(hjust = 0, size = 18,
+                                 color = "pink", face = "italic"),
+    legend.background = element_rect(fill = "yellow", color = "red", 
+                                     linewidth = 2),
+    legend.title      = element_text(color = "blue", face = "bold.italic"),
+    legend.text       = element_text(color = "black", size = 12, angle = 30),
+    
+    plot.caption      = element_text(color = "cyan", size = 12, angle = -30)
+  )
+
+```
