@@ -32,7 +32,9 @@ pacman::p_load(tidyverse,
 
 ```
 
-## 1 - A new day, a new plot, a new geom
+## 1 - A new day, a new plot, a new geom[^1]
+
+[^1]: AI was used for assistance in this project. It was used for code clarification, exception explanations, and discussions on how janitor, scales, and other packages operate. I used code snippets only when I was unable to resolve an issue independently. All text is authored exclusively by me.
 
 ```{r}
 
