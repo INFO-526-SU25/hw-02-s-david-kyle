@@ -21,7 +21,9 @@ pacman::p_load(tidyverse,
                dsbox,
                fs,
                janitor,
-               scales)
+               scales,
+               tibble,
+               ggforce)
 
 ```
 
@@ -522,5 +524,52 @@ ggplot(med_qtr, aes(x = date, y = price)) +
 ```
 
 ## 4 - Expect More. Plot More.
+
+```{r}
+
+
+# circle definitions
+outer  <- tibble(x0 = 0, y0 = 0, r = 1.0)
+hole   <- tibble(x0 = 0, y0 = 0, r = 0.68)
+center <- tibble(x0 = 0, y0 = 0, r = 0.27)
+copy_circle <- tibble(x0 = 0.45, y0 = -1.38, r = 0.06)
+
+# text label
+label_df <- tibble(x = -0.083, y = -1.3, label = "TARGET")
+label_R <- tibble(x = 0.45, y = -1.375, label = "R")
+
+ggplot() +
+  # draw the three logo circles and the copyright circle
+  geom_circle(data = outer,  aes(x0 = x0, y0 = y0, r = r),
+              fill = "#CC0000", color = NA) +
+  geom_circle(data = hole,   aes(x0 = x0, y0 = y0, r = r),
+              fill = "white",  color = NA) +
+  geom_circle(data = center, aes(x0 = x0, y0 = y0, r = r),
+              fill = "#CC0000", color = NA) +
+  geom_circle(data = copy_circle, aes(x0 = x0, y0 = y0, r = r),
+              , color = "#CC0000", size  = 1) +
+  # add text
+  geom_text(data = label_df,
+            aes(x = x, y = y, label = label),
+            color    = "#CC0000",
+            fontface = "bold",
+            size     = 10) +
+  geom_text(data = label_R,
+            aes(x = x, y = y, label = label),
+            color    = "#CC0000",
+            fontface = "bold",
+            size     = 3.5) +
+  # fix aspect ratio and allow margin for text
+  coord_equal(
+    xlim = c(-1.2, 1.2),
+    ylim = c(-1.5, 1.2),
+    clip = "off"
+  ) +
+  theme_void()
+
+
+```
+
+Target red sourced from <https://www.brandcolorcode.com/target>
 
 ## 5 - Mirror, mirror on the wall, who’s the ugliest of them all?
